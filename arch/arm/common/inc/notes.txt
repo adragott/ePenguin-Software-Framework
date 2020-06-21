@@ -1,0 +1,31 @@
+I2C -  Software Addressed Protocol
+	   Clocked Protocol
+Pins: SDA = Serial Data
+	  SCL = Serial Clock
+
+Speeds up to 400Khz, 1 Mhz
+
+SPI - Serial Protocol Interface
+	Hardware Addressed Protocol
+	Clocked Protocol
+
+Pins: MOSI (Master Out Slave In)
+	  MISO (Master In Slave Out)
+	  SCL  Serial Clock
+	  SS or nCS (Slave Select or not Chip		Select)
+
+Up to 20Mhz
+
+USART Two Wire, Non Clocked Protocol
+
+Pins:
+TX: Transmit
+RX: Receive
+
+Baudrate = bits per second (sorta)
+
+frequency = 100 / 1 time in seconds
+
+9600
+115200
+38400
