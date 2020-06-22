@@ -1,0 +1,4 @@
+.
+./arch/arm/common/inc
+./arch/arm/SAM_D2X/hal/inc
+./conf
