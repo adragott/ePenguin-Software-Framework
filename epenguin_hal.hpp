@@ -1,7 +1,9 @@
-#ifndef _EPENGUIN_H_
-#define _EPENGUIN_H_
+#ifndef _EPENGUIN_HAL_HPP_
+#define _EPENGUIN_HAL_HPP_
 
-namespace hal{};
-
+namespace hal
+{
+	namespace util{};
+};
 
 #endif

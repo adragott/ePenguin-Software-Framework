@@ -1,34 +1,14 @@
 #ifndef _HDI_SAM_D2X_H_
 #define _HDI_SAM_D2X_H_
-#include "hal_arm.h"
+#include "hal_arm.hpp"
 #include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if !(defined(__ASSEMBLY__))
-#ifndef __cplusplus
-	typedef volatile const 	uint32_t RoReg; 	// Read only 32-bit register (volatile const unsigned int)
-	typedef volatile const 	uint16_t RoReg16; 	// Read only 16-bit register (volatile const unsigned int)
-	typedef volatile const 	uint8_t  RoReg8; 	// Read only 8-bit register (volatile const unsigned int)
-#else
-	typedef volatile 			uint32_t RoReg; 	// Read only 32-bit register (volatile const unsigned int)
-	typedef volatile 			uint16_t RoReg16;	// Read only 16-bit register (volatile const unsigned int)
-	typedef volatile 			uint8_t  RoReg8;	// Read only 8-bit register (volatile const unsigned int)
+#if !(EP_MCU == __SAM_D2X__)
+	#error Shouldn't have gotten here
 #endif
-	typedef volatile			uint32_t WoReg;	// Write only 32-bit register (volatile unsigned int)
-	typedef volatile			uint16_t WoReg16;	// Write only 16-bit register (volatile unsigned int)
-	typedef volatile 			uint16_t WoReg8;	// Write only 8-bit register (volatile unsigned int)
-	typedef volatile			uint32_t RwReg;	// Write only 32-bit register (volatile unsigned int)
-	typedef volatile			uint16_t RwReg16;	// Write only 16-bit register (volatile unsigned int)
-	typedef volatile 			uint8_t  RwReg8;	// Write only 8-bit register (volatile unsigned int)
-#define CAST(type, value) ((type*)(value))
-#define REG_ACCESS(type, address) (*(type*)(address))
-#else
-#define CAST(type, value) (value)
-#define REG_ACCESS(type, address) (address)
-#endif
-
 typedef enum IRQn
 {
 	// Cortex-M0+ Processor Exception Numbers
@@ -51,8 +31,10 @@ typedef enum IRQn
 	SERCOM1_IRQn					= 10,
 	SERCOM2_IRQn					= 11,
 	SERCOM3_IRQn					= 12,
+	#if !()
 	SERCOM4_IRQn					= 13,
-	SERCOM5_IRQn					= 14
+	SERCOM5_IRQn					= 14,
+
 }IRQn_Type;
 #ifdef __cplusplus
 }
