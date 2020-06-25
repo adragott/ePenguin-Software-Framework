@@ -18,7 +18,7 @@ endif
 
 # Tools
 CC=arm-none-eabi-g++
-LD=arm-none-eabi-g++
+LD=arm-none-eabi-gcc
 AR=arm-none-eabi-ar
 AS=arm-none-eabi-as
 
@@ -61,9 +61,9 @@ $(BUILD_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	@echo "***************"
 	@echo "Compiling $< ---> $@"
-	$(_ATSYM_)$(CC) -c $(CFLAGS) $< -o $@
+	$(_ATSYM_)arm-none-eabi-gcc -c $(CFLAGS) $< -o $@
 	@echo "Outputting Dependency from $< ---> "$(BUILD_DIR)/$*.d
-	$(_ATSYM_)$(CC) -MM $(CFLAGS) $< > $(BUILD_DIR)/$*.d
+	$(_ATSYM_)arm-none-eabi-gcc -MM $(CFLAGS) $< > $(BUILD_DIR)/$*.d
 
 # compile and generate dependency info
 $(BUILD_DIR)/%.o: %.cpp

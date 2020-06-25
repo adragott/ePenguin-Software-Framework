@@ -16,7 +16,13 @@ int main(void);
 void __libc_init_array(void);
 
 // Dummy Handler
-static void Dummy_Handler(void);
+static void Dummy_Handler(void)
+{
+	while(1)
+	{
+
+	}
+}
 
 #define __SYSTEM_CLOCK (1000000)
 
@@ -230,12 +236,6 @@ void Reset_Handler(void)
 
         /* Infinite loop */
         while (1);
-}
-
-
-void Dummy_Handler(void)
-{
-	while(1){}
 }
 
 uint32_t SystemCoreClock = __SYSTEM_CLOCK;

@@ -184,6 +184,7 @@ void I2S_Handler                 ( void );
  */
 #include <core_cm0plus.h>
 #if !defined(DONT_USE_CMSIS_INIT)
+extern uint32_t SystemCoreClock;
 void SystemInit(void);
 void SystemCoreClockUpdate(void);
 #endif
