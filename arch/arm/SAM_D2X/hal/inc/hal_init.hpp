@@ -1,8 +1,6 @@
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef _HAL_INIT_HPP_
+#define _HAL_INIT_HPP_
 
 
-#ifdef __cplusplus
-}
+
 #endif

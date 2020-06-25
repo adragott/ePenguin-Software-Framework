@@ -4,13 +4,13 @@
 #include "epenguin_conf.h"
 
 #if !(EP_UARCH == __UARCH_ARM__)
-	#error This shouldn't be included unless arm is the uarch of choice!
+	#error This shouldnt be included unless arm is the uarch of choice!
 #endif
 
 
 #if !(defined(__ASSEMBLY__))
 #include <stdint.h>
-#ifndef __cplusplus
+// #ifndef __cplusplus
 // 	typedef volatile const 	uint32_t RoReg; 	// Read only 32-bit register (volatile const unsigned int)
 // 	typedef volatile const 	uint16_t RoReg16; 	// Read only 16-bit register (volatile const unsigned int)
 // 	typedef volatile const 	uint8_t  RoReg8; 	// Read only 8-bit register (volatile const unsigned int)
@@ -35,5 +35,8 @@ typedef volatile 			uint8_t  RwReg8;	// Write only 8-bit register (volatile unsi
 #define REG_ACCESS(type, address) (address)
 #endif
 
-namespace hal::arm{};
+namespace hal::arm
+{
+	
+}
 #endif
