@@ -222,6 +222,8 @@
    ======================================================================== */
 
 #include <stdint.h>
+#include <stdio.h>
+#include <stdbool.h>
 
 #define global static
 #define u8 uint8_t
@@ -283,16 +285,11 @@ global f32 GlobalFrequency;
 #define COUNTERTONS   COUNTERTOUS * 1000.f
 #define COUNTERTOS    COUNTERTOMS / 1000.f
 
-
-#include <stdio.h>
-#include <stdbool.h>
-
 //
 // PLATFORM SPECIFIC CODE
 //
 
 // note(jax): Eventually support Mac...
-#define BUILD_LINUX
 #ifdef BUILD_LINUX
 #include <stdlib.h>
 #include <string.h>
