@@ -28,5 +28,7 @@ del *.map > NUL 2> NUL
 %CompileCommand% %CommonCompilerFlags% -LD ../libcommon/src/libcommon.cpp -Folibcommon.obj -Fmlibcommon.map /link %CommonLinkerFlags% -noentry
 lib -nologo libcommon.obj
 
+%CompileCommand% %CommonCompilerFlags% ../tests/src/tests.cpp -Fotests.obj -Fmtests.map /link %CommonLinkerFlags% libcommon.lib
+
 ..\tools\btime.exe --end ePenguin-Software-Framework.aet
 popd
