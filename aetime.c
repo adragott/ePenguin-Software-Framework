@@ -224,10 +224,10 @@
 #include <stdint.h>
 
 #define global static
-#define uint unsigned int
 #define u8 uint8_t
 #define u32 uint32_t
 #define f32 float
+#define uint u32
 
 #define GenerateMagic(a, b, c, d) (((u32)(a) << 0) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
 
@@ -246,11 +246,6 @@ typedef struct timer_entry_array {
     timer_file_entry* Entries;
 } timer_entry_array;
 #pragma pack(pop)
-
-// note(jax): Eventually support Mac/Linux...
-#include <stdio.h>
-#include <stdbool.h>
-#include <Windows.h>
 
 int StringLength(char* String) {
     int Count = 0;
@@ -283,10 +278,179 @@ bool StringsMatch(char* A, char* B) {
 
 global f32 GlobalFrequency;
 
+
 #define COUNTERTOMS   1.f / (GlobalFrequency / 1000.f)
 #define COUNTERTOUS   COUNTERTOMS * 1000.f
 #define COUNTERTONS   COUNTERTOUS * 1000.f
 #define COUNTERTOS    COUNTERTOMS / 1000.f
+
+
+#include <stdio.h>
+#include <stdbool.h>
+
+//
+// PLATFORM SPECIFIC CODE
+//
+
+// note(jax): Eventually support Mac...
+#define BUILD_LINUX
+#ifdef BUILD_LINUX
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <linux/limits.h>
+#include <sys/time.h>
+
+global void Usage(char** Args) {
+    fprintf(stdout, "Usage: %s --begin <file>.aet [-v|--v|--verbose|-verbose]\n", Args[0]);
+    fprintf(stdout, "       %s --end <file>.aet [-v|--v|--verbose|-verbose]\n", Args[0]);
+}
+
+// This function assumes FileName is a full path with an extension
+char* GetBaseName(char* FileName) {
+    int BaseNameSize = 0;
+    char* BaseName = (char*)malloc(sizeof(char)*PATH_MAX);
+    char* BaseNameBegin = FileName;
+    char* BaseNameEnd = FileName + StringLength(FileName);
+    bool RightOfPeriod = false;
+    for (char* Scan = BaseNameBegin; *Scan; ++Scan) {
+        if ((Scan[0] == '\\') || (Scan[0] == '/')) {
+            BaseNameBegin = Scan + 1;
+        }
+
+        if (Scan[0] == '.') {
+            BaseNameEnd = Scan;
+            RightOfPeriod = true;
+        }
+        else if (!RightOfPeriod) {
+            ++BaseNameSize;
+        }
+    }
+
+    memcpy(BaseName, BaseNameBegin, BaseNameSize);
+    BaseName[BaseNameSize] = 0;
+
+    return BaseName;
+}
+
+uint64_t rdtsc(){
+    unsigned int lo,hi;
+    __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
+    return ((uint64_t)hi << 32) | lo;
+}
+
+static uint64_t _get_tsc_ticks_since_reset_p() {
+    uint32_t countlo, counthi;
+    uint32_t chx; // Set to processor signature register - set to chip/socket & core ID by recent Linux kernels.
+    
+    __asm__ volatile("RDTSCP" : "=a" (countlo), "=d" (counthi), "=c" (chx));
+    return (uint64_t(counthi) << 32) | countlo;
+}
+
+#define BILLION 1E9
+
+int main(int ArgCount, char** Args) {
+    bool IsVerbose = false;
+    if (StringsMatch(Args[3], "--verbose") ||
+        StringsMatch(Args[3], "--v") ||
+        StringsMatch(Args[3], "-verbose") ||
+        StringsMatch(Args[3], "-v")) {
+        IsVerbose = true;
+    }
+
+    char Path[PATH_MAX];
+    sprintf(Path, "/tmp/");
+
+    struct timeval tv;
+    gettimeofday(&tv, nullptr);
+    double init_time_ = tv.tv_sec + tv.tv_usec*0.000001;
+    double init_tick_ = _get_tsc_ticks_since_reset_p();
+
+    gettimeofday(&tv, nullptr);
+    double seconds_since_epoch = tv.tv_sec + tv.tv_usec*0.000001;
+
+    const double dTime = seconds_since_epoch - init_time_;
+    const uint64_t dTicks = _get_tsc_ticks_since_reset_p() - init_tick_;
+    GlobalFrequency = 1000000;
+
+    if (ArgCount >= 3) {
+        if (StringsMatch(Args[1], "--begin")) {
+            char* FileName = Args[2];
+            sprintf(Path + strlen(Path), "%s", FileName);
+
+            FILE* Dest = fopen(Path, "wb");
+            if (Dest) {
+                if (IsVerbose) {
+                    printf("Writing to '%s'\n", Path);
+                }
+
+                timer_file_header Header = {0};
+                Header.Magic = AET_MAGIC_VALUE;
+                fwrite(&Header, sizeof(Header), 1, Dest);
+
+                timer_file_entry Entry = {0};
+                struct timespec Timer;
+                clock_gettime(CLOCK_MONOTONIC_RAW, &Timer);
+                Entry.Elapsed = (Timer.tv_nsec) + (Timer.tv_sec) * BILLION;
+
+                printf("Compilation started for %s\n", GetBaseName(FileName));
+                if (fwrite(&Entry, sizeof(Entry), 1, Dest) != 1) {
+                    fprintf(stdout, "ERROR: Failed to append new start entry to file '%s'.\n", FileName);
+                } else {
+                    fclose(Dest);
+                }
+            } else {
+                fprintf(stdout, "ERROR: Failed to open file '%s'.\n", FileName);
+            }
+        } else if (StringsMatch(Args[1], "--end")) {
+            char* FileName = Args[2];
+            sprintf(Path + strlen(Path), "%s", FileName);
+
+            FILE* Dest = fopen(Path, "rb");
+            if (Dest) {
+                if (IsVerbose) {
+                    printf("Reading from '%s'\n", Path);
+                }
+
+                timer_file_header Header = {0};
+                fread(&Header, sizeof(Header), 1, Dest);
+                if (IsVerbose) {
+                    printf("struct timer_file_header {\n    Magic: %u\n};\n", Header.Magic);
+                }
+
+                timer_file_entry Entry = {0};
+                if(fread(&Entry, sizeof(Entry), 1, Dest) == 1) {
+                    struct timespec Timer;
+                    clock_gettime(CLOCK_MONOTONIC_RAW, &Timer);
+
+                    f32 Elapsed = ((Timer.tv_nsec) + (Timer.tv_sec) * BILLION) - Entry.Elapsed;
+                    f32 Milliseconds = Elapsed / 1000.f / 1000.f;
+                    f32 Seconds = Milliseconds / 1000.f;
+                    printf("Compilation ended: %f seconds\n", Seconds);
+                } else {
+                    fprintf(stdout, "ERROR: Failed to read start entry from file '%s'.\n", FileName);
+                }
+
+                fclose(Dest);
+
+                if (remove(Path) != 0) {
+                    fprintf(stdout, "ERROR: Failed to remove file '%s'.\n", FileName);
+                }
+            } else {
+                fprintf(stdout, "ERROR: Failed to open file '%s'.\n", FileName);
+            }
+        } else {
+            Usage(Args);
+        }
+    } else {
+        Usage(Args);
+    }
+
+    return 1;
+}
+
+#elif BUILD_WIN32
+#include <Windows.h>
 
 global void Usage(char** Args) {
     fprintf(stderr, "Usage: %s --begin <file>.aet [-v|--v|--verbose|-verbose]\n", Args[0]);
@@ -410,3 +574,4 @@ int main(int ArgCount, char** Args) {
 
     return 1;
 }
+#endif
