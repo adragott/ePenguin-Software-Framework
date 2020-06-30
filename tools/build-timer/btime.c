@@ -278,7 +278,6 @@ bool StringsMatch(char* A, char* B) {
 
 global f32 GlobalFrequency;
 
-
 #define COUNTERTOMS   1.f / (GlobalFrequency / 1000.f)
 #define COUNTERTOUS   COUNTERTOMS * 1000.f
 #define COUNTERTONS   COUNTERTOUS * 1000.f
@@ -339,16 +338,6 @@ uint64_t rdtsc(){
     return ((uint64_t)hi << 32) | lo;
 }
 
-static uint64_t _get_tsc_ticks_since_reset_p() {
-    uint32_t countlo, counthi;
-    uint32_t chx; // Set to processor signature register - set to chip/socket & core ID by recent Linux kernels.
-    
-    __asm__ volatile("RDTSCP" : "=a" (countlo), "=d" (counthi), "=c" (chx));
-    return (uint64_t(counthi) << 32) | countlo;
-}
-
-#define BILLION 1E9
-
 int main(int ArgCount, char** Args) {
     bool IsVerbose = false;
     if (StringsMatch(Args[3], "--verbose") ||
@@ -361,16 +350,6 @@ int main(int ArgCount, char** Args) {
     char Path[PATH_MAX];
     sprintf(Path, "/tmp/");
 
-    struct timeval tv;
-    gettimeofday(&tv, nullptr);
-    double init_time_ = tv.tv_sec + tv.tv_usec*0.000001;
-    double init_tick_ = _get_tsc_ticks_since_reset_p();
-
-    gettimeofday(&tv, nullptr);
-    double seconds_since_epoch = tv.tv_sec + tv.tv_usec*0.000001;
-
-    const double dTime = seconds_since_epoch - init_time_;
-    const uint64_t dTicks = _get_tsc_ticks_since_reset_p() - init_tick_;
     GlobalFrequency = 1000000;
 
     if (ArgCount >= 3) {
@@ -391,7 +370,7 @@ int main(int ArgCount, char** Args) {
                 timer_file_entry Entry = {0};
                 struct timespec Timer;
                 clock_gettime(CLOCK_MONOTONIC_RAW, &Timer);
-                Entry.Elapsed = (Timer.tv_nsec) + (Timer.tv_sec) * BILLION;
+                Entry.Elapsed = (Timer.tv_nsec) + (Timer.tv_sec) * 1E9;
 
                 printf("Compilation started for %s\n", GetBaseName(FileName));
                 if (fwrite(&Entry, sizeof(Entry), 1, Dest) != 1) {
@@ -423,7 +402,7 @@ int main(int ArgCount, char** Args) {
                     struct timespec Timer;
                     clock_gettime(CLOCK_MONOTONIC_RAW, &Timer);
 
-                    f32 Elapsed = ((Timer.tv_nsec) + (Timer.tv_sec) * BILLION) - Entry.Elapsed;
+                    f32 Elapsed = ((Timer.tv_nsec) + (Timer.tv_sec) * 1E9) - Entry.Elapsed;
                     f32 Milliseconds = Elapsed / 1000.f / 1000.f;
                     f32 Seconds = Milliseconds / 1000.f;
                     printf("Compilation ended: %f seconds\n", Seconds);
