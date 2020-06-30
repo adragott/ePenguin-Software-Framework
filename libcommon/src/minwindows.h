@@ -1186,5 +1186,6 @@ WINDOWS_API_IMPORT BOOL WINAPI wglDeleteContext(HGLRC Arg1);
 WINDOWS_API_IMPORT PROC WINAPI wglGetProcAddress(LPCSTR Arg1);
 
 WINDOWS_API_IMPORT BOOL WINAPI WriteConsole(HANDLE hConsoleOutput, const VOID *lpBuffer, DWORD nNumberOfCharsToWrite, LPDWORD lpNumberOfCharsWritten, LPVOID lpReserved);
+WINDOWS_API_IMPORT BOOL WINAPI GetFullPathNameA(LPCSTR lpFileName, DWORD nBufferLength, LPSTR lpBuffer, LPSTR *lpFilePart);
 
 #endif
