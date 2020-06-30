@@ -55,7 +55,7 @@ struct tokenizer {
 b32 IsTokenValid(token Token);
 b32 TokenEquals(token Token, char* Match);
 API_EXPORT token GetToken(tokenizer* Tokenizer);
-API_EXPORT token PeekToken(tokenizer* Tokenizer, int Lookahead);
+API_EXPORT token PeekToken(tokenizer* Tokenizer);
 API_EXPORT tokenizer Tokenize(char* Data);
 API_EXPORT tokenizer Tokenize(char* Filename);
 API_EXPORT tokenizer Tokenize(string Data, char* Filename);

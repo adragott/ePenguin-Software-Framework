@@ -83,6 +83,31 @@ inline b32 IsPow2(u32 Value) {
     return ((Value & ~(Value - 1)) == Value);
 }
 
+//Regular text
+#define BLACK "\33[0;30m"
+#define RED "\33[0;31m"
+#define GREEN "\33[0;32m"
+#define YELLOW "\33[0;33m"
+#define BLUE "\33[0;34m"
+#define MAGENTA "\33[0;35m"
+#define CYAN "\33[0;36m"
+#define WHITE "\33[0;37m"
+#define LIGHT_GRAY "\33[0;37m"
+#define DARK_GRAY "\33[1;30m"
+
+//Regular bold text
+#define BOLD_BLACK "\33[1;30m"
+#define BOLD_RED "\33[1;31m"
+#define BOLD_GREEN "\33[1;32m"
+#define BOLD_YELLOW "\33[1;33m"
+#define BOLD_BLUE "\33[1;34m"
+#define BOLD_MAGENTA "\33[1;35m"
+#define BOLD_CYAN "\33[1;36m"
+#define BOLD_WHITE "\33[1;37m"
+
+//Reset
+#define RESET "\33[0m"
+
 // note(jax): Platform-independent way to perform an assertion.
 // Flat out writes to zero memory to crash the program.
 // todo(jax): Create some sort of assert function that creates a message box 

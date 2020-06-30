@@ -111,6 +111,14 @@ inline int StringLength(char* String) {
     return Count;
 }
 
+inline string make_string(char* String) {
+    string Result = {};
+    Result.Data = (u8*)String;
+    Result.Count = StringLength(String);
+
+    return Result;
+}
+
 inline char* Substring(char* Source, char* String)  {
 	while (*Source) {
         char *Begin = Source;
@@ -236,7 +244,7 @@ void U64ToASCII(format_dest* Dest, u64 Value, u32 Base, char* Digits);
 void F64ToASCII(format_dest* Dest, f64 Value, u32 Precision);
 
 // note(jax): This function serves as a replacement to `stdio.h` sprintf()
-umm FormatArgList(umm DestSize, char* DestInit, char* Format, va_list ArgList);
+API_EXPORT umm FormatArgList(umm DestSize, char* DestInit, char* Format, va_list ArgList);
 inline umm Format(umm DestSize, char* Dest, char* Format, ...) {
     va_list ArgList;
     _crt_va_start(ArgList, Format);

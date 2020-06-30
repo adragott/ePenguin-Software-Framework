@@ -87,15 +87,25 @@ token GetToken(tokenizer* Tokenizer) {
                 AdvanceInput(Tokenizer, 1);
             }
 
+            // Speed: This block of code is pretty hacky...
             if (Token.Text.Count &&
                 (Token.Text.Data[0] == '"')) {
                 ++Token.Text.Data;
                 --Token.Text.Count;
-            }
 
-            if (Token.Text.Count &&
-                (Token.Text.Data[Token.Text.Count - 1] == '"')) {
-                --Token.Text.Count;
+                int TextLength = 0;
+                char* Temp = (char*)malloc(Token.Text.Count);
+                sprintf(Temp, "%s", Token.Text.Data);
+                while (Temp) {
+                    if (*Temp == '\"') {
+                        break;
+                    }
+                    ++TextLength;
+                    ++Temp;
+                }
+
+                Token.String = (char*)malloc(TextLength);
+                sprintf(Token.String, "%.*s", (int)TextLength, Token.Text.Data);
             }
         } break;
 
@@ -149,6 +159,10 @@ token GetToken(tokenizer* Tokenizer) {
                 while (IsAlphabetical(Tokenizer->At[0]) || IsNumeric(Tokenizer->At[0]) || (Tokenizer->At[0] == '_')) {
                     AdvanceInput(Tokenizer, 1);
                 }
+
+                __int64 IndentLength = (Tokenizer->Input.Data - Token.Text.Data);
+                Token.String = (char*)malloc(IndentLength);
+                sprintf(Token.String, "%.*s", (int)IndentLength, Token.Text.Data);
             } else if (IsNumeric(C)) {
                 f32 Number = (f32)(C - '0');
                 
@@ -184,4 +198,9 @@ token GetToken(tokenizer* Tokenizer) {
     return Token;
 }
 
-token PeekToken(tokenizer* Tokenizer);
+token PeekToken(tokenizer* Tokenizer) {
+    tokenizer Temp = *Tokenizer;
+    token Result = GetToken(Tokenizer);
+    *Tokenizer = Temp;
+    return Result;
+}
