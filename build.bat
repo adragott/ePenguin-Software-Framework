@@ -30,5 +30,9 @@ lib -nologo libcommon.obj
 
 %CompileCommand% %CommonCompilerFlags% ../tests/src/tests.cpp -Fotests.obj -Fmtests.map /link %CommonLinkerFlags% libcommon.lib
 
+robocopy . ..\ libcommon.lib > NUL 2> NUL
+del ..\test > NUL 2> NUL
+copy tests.exe ..\test > NUL 2> NUL
+
 ..\tools\btime.exe --end ePenguin-Software-Framework.aet
 popd
