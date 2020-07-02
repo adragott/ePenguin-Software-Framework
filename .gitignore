@@ -2,4 +2,6 @@ GTAGS
 GPATH
 GRTAGS
 .clang*
+test/build/*
+test/bin/*
 

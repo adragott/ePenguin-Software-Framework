@@ -82,6 +82,7 @@
 #define __ATSAMD21J18A__ (31)
 
 #endif
+
 #include "epenguin_conf.hpp"
 
 #endif

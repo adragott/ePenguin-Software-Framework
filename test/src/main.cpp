@@ -1,5 +1,4 @@
 #include "epenguin.hpp"
-#include "hal_sam_d2x.hpp"
 #include <inttypes.h>
 
 
@@ -16,8 +15,8 @@
 // LED 0: PA09
 // LED 1: PB01
 
-#define LED0_PORT		  	(0)
-#define LED0_PIN			(9)
+#define LED0_PORT		  	(1)
+#define LED0_PIN			(30)
 
 #define LED1_PORT               (1)
 #define LED1_PIN    			(1)
